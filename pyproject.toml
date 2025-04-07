@@ -1,0 +1,12 @@
+[project]
+name = "Lumin"
+version = "0.1.0"
+description = "description"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "asyncpg>=0.30.0",
+    "sqlalchemy>=2.0.37",
+    "uvicorn>=0.34.0",
+    "starlette>=0.46.1"
+]
