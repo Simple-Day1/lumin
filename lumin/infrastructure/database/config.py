@@ -5,9 +5,9 @@ from dataclasses import dataclass, field
 class PostgresConfig:
     host: str = field(default="localhost")
     port: int = field(default=5432)
-    user: str = field(default="postgres")
-    password: str = field(default="postgres")
-    database: str = field(default="postgres")
+    user: str = field(default="some_user")
+    password: str = field(default="some_user")
+    database: str = field(default="testdb")
     echo: bool = field(default=False)
 
     @property

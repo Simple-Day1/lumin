@@ -9,7 +9,8 @@ class Channel:
         channel_description: str,
         subscribers: list[UUID],
         admins: list[UUID],
-        public: bool
+        public: bool,
+        channel_avatar_url: str,
     ) -> None:
         self.channel_id = channel_id
         self.channel_name = channel_name
@@ -17,3 +18,4 @@ class Channel:
         self.subscribers = subscribers
         self.admins = admins
         self.public = public
+        self.channel_avatar_url = channel_avatar_url

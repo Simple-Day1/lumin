@@ -7,12 +7,16 @@ class User:
         self,
         user_id: UUID,
         username: str,
+        email: str,
         description: str,
         phone: Phone,
-        date: Date
+        date: Date,
+        user_avatar_url: str,
     ) -> None:
         self.user_id = user_id
         self.username = username
+        self.email = email
         self.description = description
         self.phone = phone
         self.date = date
+        self.user_avatar_url = user_avatar_url

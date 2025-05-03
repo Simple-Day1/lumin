@@ -12,8 +12,8 @@ class Massage:
         recipient_id: UUID,
         timestamp: datetime,
         chat_id: UUID,
-        photo_id: UUID | None,
-        video_id: UUID | None,
+        photo_urls: list[str] | None,
+        video_urls: list[str] | None,
         status: str,
         reaction_id: UUID | None,
         fixed: bool
@@ -24,8 +24,8 @@ class Massage:
         self.recipient_id = recipient_id
         self.timestamp = timestamp
         self.chat_id = chat_id
-        self.photo_url = photo_id
-        self.video_url = video_id
+        self.photo_urls = photo_urls
+        self.video_urls = video_urls
         self.status = status
         self.reaction_id = reaction_id
         self.fixed = fixed

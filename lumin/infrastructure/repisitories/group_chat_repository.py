@@ -1,45 +1,89 @@
+from typing import Type
 from uuid import UUID
-
+from sqlalchemy import text
 from lumin.domain.group_chat.exceptions import GroupChatIsAlreadyError, GroupChatIsNotExistError
 from lumin.domain.group_chat.group_chat import GroupChat
-from lumin.infrastructure.database.database import group_chats_database
+from lumin.infrastructure.database.config import PostgresConfig
+from lumin.infrastructure.database.main import setup_engine, setup_connection
 
 
 class GroupChatRepository:
     @staticmethod
     def add(group_chat: GroupChat) -> None:
-        if group_chat.group_chat_id in group_chats_database.keys():
-            raise GroupChatIsAlreadyError('Group chat is already exist!')
-        else:
-            group_chats_database[group_chat.group_chat_id] = {
-                'members': group_chat.members,
-                'admins': group_chat.admins
-            }
+        try:
+            command = text(
+                """
+                INSERT INTO group_chats(group_chat_id, group_chat_name, group_chat_avatar_url)
+                VALUES :group_chat_id, :group_chat_name, :group_chat_avatar_url)
+                """
+            ).bindparams(
+                group_chat_id=group_chat.group_chat_id,
+                group_chat_name=group_chat.group_chat_name,
+                group_chat_avatar_url=group_chat.group_chat_avatar_url
+            )
+            engine = setup_engine(Type[PostgresConfig])
+            with setup_connection(engine) as connection:
+                connection.execute(command)
+        except Exception as e:
+            raise GroupChatIsAlreadyError(f"{e}")
 
     @staticmethod
     def delete(group_chat: GroupChat) -> None:
-        if group_chat.group_chat_id in group_chats_database.keys():
-            group_chats_database.pop(group_chat.group_chat_id)
-        else:
-            raise GroupChatIsNotExistError('Group chat is not exist!')
+        try:
+            command = text(
+                """
+                DELETE FROM group_chats
+                WHERE group_chat_id = :group_chat_id
+                """
+            ).bindparams(group_chat_id=group_chat.group_chat_id)
+            engine = setup_engine(Type[PostgresConfig])
+            with setup_connection(engine) as connection:
+                connection.execute(command)
+        except Exception as e:
+            raise GroupChatIsNotExistError(f"{e}")
 
     @staticmethod
     def update(group_chat: GroupChat) -> None:
-        if group_chat.group_chat_id in group_chats_database.keys():
-            group_chats_database[group_chat.group_chat_id] = {
-                'members': group_chat.members,
-                'admins': group_chat.admins
-            }
-        else:
-            raise GroupChatIsNotExistError('Group chat is not exist!')
+        try:
+            command = text(
+                """
+                UPDATE group_chats
+                SET group_chat_id = :group_chat_id, group_chat_name = :group_chat_name, group_chat_avatar_url = :group_chat_avatar_url
+                WHERE group_chat_id = :group_chat_id
+                """
+            ).bindparams(
+                group_chat_id=group_chat.group_chat_id,
+                group_chat_name=group_chat.group_chat_name,
+                group_chat_avatar_url=group_chat.group_chat_avatar_url
+            )
+            engine = setup_engine(Type[PostgresConfig])
+            with setup_connection(engine) as connection:
+                connection.execute(command)
+        except Exception as e:
+            raise GroupChatIsNotExistError(f"{e}")
 
     @staticmethod
-    def with_id(group_chat_id: UUID) -> GroupChat | None:
-        if group_chat_id in group_chats_database.keys():
+    async def with_id(group_chat_id: UUID) -> GroupChat | None:
+        try:
+            query = text(
+                """
+                SELECT group_chat_id, group_chat_name, group_chat_avatar_url
+                FROM group_chats
+                WHERE group_chat_id = :group_chat_id
+                """
+            ).bindparams(group_chat_id=group_chat_id)
+            engine = setup_engine(Type[PostgresConfig])
+            with setup_connection(engine) as connection:
+                result = await connection.execute(query)
+                row = result.fetchone()
+
+            if not row:
+                return None
+
             return GroupChat(
-                group_chat_id=group_chat_id,
-                members=group_chats_database[group_chat_id]['members'],
-                admins=group_chats_database[group_chat_id]['admins']
+                group_chat_id=row.group_chat_id,
+                group_chat_name=row.group_chat_name,
+                group_chat_avatar_url=row.group_chat_avatar_url
             )
-        else:
-            raise GroupChatIsNotExistError('Group chat is not exist!')
+        except Exception as e:
+            raise GroupChatIsNotExistError(f"{e}")

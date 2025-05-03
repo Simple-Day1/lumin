@@ -19,6 +19,7 @@ users_table = Table(
     Column("description", String(120)),
     Column("phone", String(120)),
     Column("date", Date),
+    Column("user_avatar_url", String)
 )
 
 personal_chats_table = Table(
@@ -31,12 +32,18 @@ group_chat_table = Table(
     "group_chats",
     metadata,
     Column("group_chat_id", UUID, primary_key=True),
+    Column("group_chat_name", String),
+    Column("group_chat_avatar_url", String)
 )
 
 channels_table = Table(
     "channels",
     metadata,
     Column("channel_id", UUID, primary_key=True),
+    Column("channel_name", String),
+    Column("channel_description", String),
+    Column("channel_public_status", Boolean),
+    Column("channel_avatar_url", String)
 )
 
 massages_table = Table(
